@@ -1,0 +1,34 @@
+<div class="header-panel member">
+<h2><span class="identifier">FlexGrid</span> Class</h2>
+<dl class="dl-horizontal">
+<dt>File</dt><dd class="filename">wijmo.react.js</dd>
+<dt>Module</dt><dd><a href="topic/wijmo.react.Module.html"><span class="identifier">wijmo.react</span></a></dd>
+<dt>Base Class</dt><dd><a href="topic/wijmo.react.ComponentBase.Class.html"><span class="identifier">ComponentBase</span></a></dd>
+<dt>Show</dt>
+<dd>
+<label><input type="checkbox" ng-model="ctx.showInherited"> Inherited Members</label>&nbsp;&nbsp;&nbsp;
+<label><input type="checkbox" ng-model="ctx.showRaisers"> Event Raisers</label>
+</dd>
+</dl>
+<div class="comment"><p>React component that encapsulates the <a href="topic/wijmo.grid.FlexGrid.Class.html"><span class="identifier">FlexGrid</span></a> control.
+The example below shows how to instantiate and initialize a
+<a href="topic/wijmo.grid.FlexGrid.Class.html"><span class="identifier">FlexGrid</span></a> control in JSX:</p>
+
+
+<pre>&lt;Wj.FlexGrid
+  autoGenerateColumns={ false }
+  columns={[
+    { binding: 'name', header: 'Name' },
+    { binding: 'sales', header: 'Sales', format: 'c0' },
+    { binding: 'expenses', header: 'Expenses', format: 'c0' },
+    { binding: 'active', header: 'Active' },
+    { binding: 'date', header: 'Date' }
+  ]}
+  itemsSource={ this.state.data } /&gt;</pre>
+<p>The code sets the <b>autoGenerateColumns</b> property to false, then
+sets the <b>columns</b> property, and finally sets the <b>itemsSource</b>
+property. This order is important, it prevents the grid from automatically
+generating the columns.</p></div>
+</div>
+<div class="member-panel class members" ng-class="{ 'show-inherited' : ctx.showInherited, 'show-raisers' : ctx.showRaisers }">
+</div>
