@@ -1,9 +1,7 @@
 
-
 {
-  "name": "wijmo5",
+  "name": "wijmo",
   "version": "5.20171.300",
-  "main": "NpmImages/wijmo-amd-min",
   "description": "Wijmo 5",
   "author": "GrapeCity, Inc",
   "license": "Commercial"
