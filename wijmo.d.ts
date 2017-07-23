@@ -134,7 +134,7 @@ export declare class DateTime {
     static fromDateTime(date: Date, time: Date): Date;
     static toFiscal(date: Date, govt: boolean): Date;
     static fromFiscal(date: Date, govt: boolean): Date;
-    static newDate(): Date;
+    static newDate(year?: number, month?: number, day?: number, hour?: number, min?: number, sec?: number, ms?: number): Date;
     static clone(date: Date): Date;
 }
 export declare function httpRequest(url: string, settings?: any): XMLHttpRequest;
@@ -203,22 +203,24 @@ export declare class RequestErrorEventArgs extends CancelEventArgs {
     message: string;
 }
 export declare class Control {
-    private static _DATA_KEY;
-    private static _REFRESH_INTERVAL;
-    private static _rxInputAtts;
-    private static _wme;
+    protected static _wme: HTMLElement;
     static _touching: boolean;
+    static _REFRESH_INTERVAL: number;
+    static _CTRL_KEY: string;
+    static _OWNR_KEY: string;
+    static _SCRL_KEY: string;
+    static _rxInputAtts: RegExp;
+    private _e;
+    private _orgOuter;
+    private _orgInner;
+    private _listeners;
+    protected _orgTag: string;
     private _focus;
     private _updating;
     private _fullUpdate;
     private _toInv;
     private _szCtl;
     private _rtlDir;
-    private _e;
-    private _orgOuter;
-    private _orgInner;
-    private _listeners;
-    protected _orgTag: string;
     constructor(element: any, options?: any, invalidateOnResize?: boolean);
     getTemplate(): string;
     applyTemplate(classNames: string, template: string, parts: Object, namePart?: string): HTMLElement;
@@ -242,10 +244,11 @@ export declare class Control {
     initialize(options: any): void;
     addEventListener(target: EventTarget, type: string, fn: any, capture?: boolean): void;
     removeEventListener(target?: EventTarget, type?: string, fn?: any, capture?: boolean): number;
-    gotFocus: wjcSelf.Event;
+    readonly gotFocus: wjcSelf.Event;
     onGotFocus(e?: EventArgs): void;
-    lostFocus: wjcSelf.Event;
+    readonly lostFocus: wjcSelf.Event;
     onLostFocus(e?: EventArgs): void;
+    _hasPendingUpdates(): boolean;
     private static _updateWme();
     protected _handleResize(): void;
     protected _updateFocusState(): void;
@@ -407,7 +410,7 @@ export declare class ObservableArray extends ArrayBase implements INotifyCollect
     readonly isUpdating: boolean;
     deferUpdate(fn: Function): void;
     implementsInterface(interfaceName: string): boolean;
-    collectionChanged: wjcSelf.Event;
+    readonly collectionChanged: wjcSelf.Event;
     onCollectionChanged(e?: wjcSelf.NotifyCollectionChangedEventArgs): void;
     private _raiseCollectionChanged(action?, item?, index?);
 }
@@ -461,18 +464,18 @@ export declare class CollectionView implements IEditableCollectionView, IPagedCo
     clearChanges(): void;
     implementsInterface(interfaceName: string): boolean;
     getError: Function;
-    collectionChanged: wjcSelf.Event;
+    readonly collectionChanged: wjcSelf.Event;
     onCollectionChanged(e?: wjcSelf.NotifyCollectionChangedEventArgs): void;
     private _raiseCollectionChanged(action?, item?, index?);
-    sourceCollectionChanging: wjcSelf.Event;
+    readonly sourceCollectionChanging: wjcSelf.Event;
     onSourceCollectionChanging(e: CancelEventArgs): boolean;
-    sourceCollectionChanged: wjcSelf.Event;
+    readonly sourceCollectionChanged: wjcSelf.Event;
     onSourceCollectionChanged(e?: EventArgs): void;
     canFilter: boolean;
     canGroup: boolean;
     canSort: boolean;
     currentItem: any;
-    readonly currentPosition: number;
+    currentPosition: number;
     filter: IPredicate;
     readonly groupDescriptions: ObservableArray;
     readonly groups: CollectionViewGroup[];
@@ -492,9 +495,9 @@ export declare class CollectionView implements IEditableCollectionView, IPagedCo
     _performSort(items: any[]): void;
     _compareItems(): (a: any, b: any) => number;
     _performFilter(items: any[]): any[];
-    currentChanged: wjcSelf.Event;
+    readonly currentChanged: wjcSelf.Event;
     onCurrentChanged(e?: wjcSelf.EventArgs): void;
-    currentChanging: wjcSelf.Event;
+    readonly currentChanging: wjcSelf.Event;
     onCurrentChanging(e: CancelEventArgs): boolean;
     readonly items: any[];
     beginUpdate(): void;
@@ -532,9 +535,9 @@ export declare class CollectionView implements IEditableCollectionView, IPagedCo
     moveToPreviousPage(): boolean;
     moveToNextPage(): boolean;
     moveToPage(index: number): boolean;
-    pageChanged: wjcSelf.Event;
+    readonly pageChanged: wjcSelf.Event;
     onPageChanged(e?: wjcSelf.EventArgs): void;
-    pageChanging: wjcSelf.Event;
+    readonly pageChanging: wjcSelf.Event;
     onPageChanging(e: PageChangingEventArgs): boolean;
     _getFullGroup(g: CollectionViewGroup): CollectionViewGroup;
     _getGroupByPath(groups: CollectionViewGroup[], level: number, path: string): wjcSelf.CollectionViewGroup;
@@ -575,6 +578,7 @@ export declare class Tooltip {
     private _tips;
     constructor(options?: any);
     setTooltip(element: any, content: string): void;
+    getTooltip(element: any): string;
     show(element: any, content: string, bounds?: Rect): void;
     hide(): void;
     dispose(): void;
@@ -584,7 +588,7 @@ export declare class Tooltip {
     showAtMouse: boolean;
     showDelay: number;
     hideDelay: number;
-    popup: wjcSelf.Event;
+    readonly popup: wjcSelf.Event;
     onPopup(e: TooltipEventArgs): boolean;
     private _indexOf(e);
     private _attach(e);

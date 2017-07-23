@@ -246,7 +246,7 @@ export declare class PdfLinearGradientBrush extends PdfGradientBrush {
     private _y1;
     private _x2;
     private _y2;
-    constructor(x1: number, y1: number, x2: number, y2: number, stops: PdfGradientStop[], opacity: number);
+    constructor(x1: number, y1: number, x2: number, y2: number, stops: PdfGradientStop[], opacity?: number);
     x1: number;
     y1: number;
     x2: number;
@@ -262,7 +262,7 @@ export declare class PdfRadialGradientBrush extends PdfGradientBrush {
     private _x2;
     private _y2;
     private _r2;
-    constructor(x1: number, y1: number, r1: number, x2: number, y2: number, r2: number, stops: PdfGradientStop[], opacity: number);
+    constructor(x1: number, y1: number, r1: number, x2: number, y2: number, r2: number, stops: PdfGradientStop[], opacity?: number);
     x1: number;
     y1: number;
     r1: number;
@@ -577,6 +577,7 @@ export declare class _SvgStrAttr extends _SvgAttr<string> {
 }
 export declare class _SvgColorAttr extends _SvgAttr<string> {
     constructor(owner: _SvgElementBase, propName: string, defValue?: any, inheritable?: boolean);
+    asHref(): string;
     protected _parse(value: any): any;
 }
 export declare class _SvgDashArrayAttr extends _SvgAttr<number[]> {
@@ -643,7 +644,7 @@ export declare class _SvgStrokeAttributes {
     opacity: _SvgNumAttr;
     width: _SvgNumAttr;
     constructor(owner: _SvgElementBase);
-    toPen(): PdfPen;
+    toPen(element?: _SvgElementBase): PdfPen;
 }
 export declare class _SvgFillAttributes {
     private _owner;
@@ -651,7 +652,7 @@ export declare class _SvgFillAttributes {
     opacity: _SvgNumAttr;
     rule: _SvgFillRuleAttr;
     constructor(owner: _SvgElementBase);
-    toBrush(): PdfSolidBrush;
+    toBrush(element?: _SvgElementBase): PdfBrush;
 }
 export declare class _SvgFontAttributes {
     private _owner;
@@ -753,6 +754,21 @@ export declare class _SvgDefsElementImpl extends _SvgClippableElementBase {
     constructor(ctx: _ISvgRenderContext, node: SVGElement);
 }
 export declare class _SvgGElementImpl extends _SvgTransformableElementBase {
+}
+export declare class _SvgLinearGradientElementImpl extends _SvgElementBase {
+    private _x1;
+    private _x2;
+    private _y1;
+    private _y2;
+    private _gradientUnits;
+    constructor(ctx: _ISvgRenderContext, node: SVGElement);
+    toBrush(element: _SvgElementBase): PdfLinearGradientBrush;
+}
+export declare class _SvgStopElementImpl extends _SvgElementBase {
+    color: _SvgColorAttr;
+    opacity: _SvgNumAttr;
+    offset: _SvgStrAttr;
+    constructor(ctx: _ISvgRenderContext, node: SVGElement);
 }
 export declare class _SvgImageElementImpl extends _SvgTransformableElementBase {
     private _x;

@@ -35,6 +35,7 @@ export declare class WjFlexGrid extends wjcGrid.FlexGrid implements OnInit, OnDe
     draggingRowOverNg: EventEmitter<{}>;
     draggedRowNg: EventEmitter<{}>;
     deletingRowNg: EventEmitter<{}>;
+    deletedRowNg: EventEmitter<{}>;
     loadingRowsNg: EventEmitter<{}>;
     loadedRowsNg: EventEmitter<{}>;
     rowEditStartingNg: EventEmitter<{}>;

@@ -154,10 +154,11 @@ export declare class ColumnFilterEditor extends wjcCore.Control {
     readonly filter: ColumnFilter;
     updateEditor(): void;
     updateFilter(): void;
-    filterChanged: wjcCore.Event;
+    readonly filterChanged: wjcCore.Event;
     onFilterChanged(e?: wjcCore.EventArgs): void;
-    buttonClicked: wjcCore.Event;
+    readonly buttonClicked: wjcCore.Event;
     onButtonClicked(e?: wjcCore.EventArgs): void;
+    protected _handleResize(): void;
     _showFilter(filterType: FilterType): void;
     _enableLink(a: HTMLLinkElement, enable: boolean): void;
     private _getFilterType();
@@ -180,6 +181,7 @@ export declare class FlexGridFilter {
     private _showIcons;
     private _showSort;
     private _defFilterType;
+    private _tmd;
     constructor(grid: wjcGrid.FlexGrid);
     readonly grid: wjcGrid.FlexGrid;
     filterColumns: string[];
@@ -192,13 +194,17 @@ export declare class FlexGridFilter {
     closeEditor(): void;
     apply(): void;
     clear(): void;
-    filterApplied: wjcCore.Event;
+    readonly filterApplied: wjcCore.Event;
     onFilterApplied(e?: wjcCore.EventArgs): void;
-    filterChanging: wjcCore.Event;
+    readonly filterChanging: wjcCore.Event;
     onFilterChanging(e: wjcGrid.CellRangeEventArgs): void;
-    filterChanged: wjcCore.Event;
+    readonly filterChanged: wjcCore.Event;
     onFilterChanged(e: wjcGrid.CellRangeEventArgs): void;
+    _asColumn(col: any): wjcGrid.Column;
     private _filter(item);
     private _formatItem(sender, e);
-    _mouseDown(e: MouseEvent): void;
+    _mousedown(e: MouseEvent): void;
+    _click(e: MouseEvent): void;
+    private _toggleEditor(e);
+    _keydown(e: KeyboardEvent): void;
 }

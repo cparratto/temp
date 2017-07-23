@@ -1,6 +1,6 @@
 ﻿/*
     *
-    * Wijmo Library 5.20171.300
+    * Wijmo Library 5.20172.328
     * http://wijmo.com/
     *
     * Copyright(c) GrapeCity, Inc.  All rights reserved.
@@ -1250,7 +1250,7 @@ return WjContextMenu.prototype.onContextMenu = function(e)
 {
 var menu=this.wjContextMenu,
 dropDown=menu.dropDown;
-menu && dropDown && !wjcCore.closest(e.target, '[disabled]') && (e.preventDefault(), menu.owner = this.elRef.nativeElement, menu.selectedIndex = -1, menu.onIsDroppedDownChanging(new wjcCore.CancelEventArgs) && (wjcCore.showPopup(dropDown, e), menu.onIsDroppedDownChanged(), dropDown.focus()))
+menu && dropDown && !wjcCore.closest(e.target, '[disabled]') && (e.preventDefault(), menu.owner = this.elRef.nativeElement, menu.show(e))
 }, WjContextMenu
 }();
 WjContextMenu.decorators = [{

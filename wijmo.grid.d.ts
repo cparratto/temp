@@ -10,6 +10,7 @@ export declare enum HeadersVisibility {
 export declare class FlexGrid extends wjcCore.Control {
     static _WJS_STICKY: string;
     static _WJS_MEASURE: string;
+    static _WJS_UPDATING: string;
     static _MIN_VIRT_ROWS: number;
     private _root;
     private _eCt;
@@ -17,6 +18,7 @@ export declare class FlexGrid extends wjcCore.Control {
     _eTL: HTMLDivElement;
     _eBL: HTMLDivElement;
     _eFocus: HTMLDivElement;
+    _activeCell: HTMLElement;
     private _eCHdr;
     private _eCFtr;
     private _eRHdr;
@@ -28,6 +30,8 @@ export declare class FlexGrid extends wjcCore.Control {
     private _eSz;
     private _eMarquee;
     private _scrollHandlerAttached;
+    private _itemValidator;
+    private _fzClone;
     private _gpTL;
     private _gpCHdr;
     private _gpRHdr;
@@ -78,6 +82,7 @@ export declare class FlexGrid extends wjcCore.Control {
     private _items;
     private _cv;
     private _childItemsPath;
+    private _rowHdrPath;
     private _sortRowIndex;
     private _deferResizing;
     private _bndSortConverter;
@@ -115,12 +120,15 @@ export declare class FlexGrid extends wjcCore.Control {
     showGroups: boolean;
     showAlternatingRows: boolean;
     showErrors: boolean;
+    itemValidator: Function;
     validateEdits: boolean;
     groupHeaderFormat: string;
     allowDragging: AllowDragging;
     itemsSource: any;
     readonly collectionView: wjcCore.ICollectionView;
+    readonly editableCollectionView: wjcCore.IEditableCollectionView;
     childItemsPath: any;
+    rowHeaderPath: string;
     readonly cells: GridPanel;
     readonly columnHeaders: GridPanel;
     readonly columnFooters: GridPanel;
@@ -132,6 +140,7 @@ export declare class FlexGrid extends wjcCore.Control {
     getColumn(name: string): Column;
     frozenRows: number;
     frozenColumns: number;
+    cloneFrozenCells: boolean;
     sortRowIndex: number;
     scrollPosition: wjcCore.Point;
     readonly clientSize: wjcCore.Size;
@@ -147,11 +156,7 @@ export declare class FlexGrid extends wjcCore.Control {
     hitTest(pt: any, y?: number): HitTestInfo;
     getClipString(rng?: CellRange): string;
     setClipString(text: string, rng?: CellRange): void;
-    _clipToRows(text: string): string[];
-    _clipToCells(text: string): string[];
-    _expandClipString(text: string, rng: CellRange): string;
     focus(): void;
-    containsFocus(): boolean;
     dispose(): void;
     refresh(fullUpdate?: boolean): void;
     refreshCells(fullUpdate: boolean, recycle?: boolean, state?: boolean): void;
@@ -175,98 +180,104 @@ export declare class FlexGrid extends wjcCore.Control {
     readonly editRange: CellRange;
     mergeManager: MergeManager;
     getMergedRange(p: GridPanel, r: number, c: number, clip?: boolean): CellRange;
-    itemsSourceChanged: wjcCore.Event;
+    keyActionTab: KeyAction;
+    keyActionEnter: KeyAction;
+    readonly itemsSourceChanged: wjcCore.Event;
     onItemsSourceChanged(e?: wjcCore.EventArgs): void;
-    scrollPositionChanged: wjcCore.Event;
+    readonly scrollPositionChanged: wjcCore.Event;
     onScrollPositionChanged(e?: wjcCore.EventArgs): void;
-    selectionChanging: wjcCore.Event;
+    readonly selectionChanging: wjcCore.Event;
     onSelectionChanging(e: CellRangeEventArgs): boolean;
-    selectionChanged: wjcCore.Event;
+    readonly selectionChanged: wjcCore.Event;
     onSelectionChanged(e: CellRangeEventArgs): void;
-    loadingRows: wjcCore.Event;
+    readonly loadingRows: wjcCore.Event;
     onLoadingRows(e: wjcCore.CancelEventArgs): boolean;
-    loadedRows: wjcCore.Event;
+    readonly loadedRows: wjcCore.Event;
     onLoadedRows(e?: wjcCore.EventArgs): void;
-    updatingLayout: wjcCore.Event;
+    readonly updatingLayout: wjcCore.Event;
     onUpdatingLayout(e: wjcCore.CancelEventArgs): boolean;
-    updatedLayout: wjcCore.Event;
+    readonly updatedLayout: wjcCore.Event;
     onUpdatedLayout(e?: wjcCore.EventArgs): void;
-    resizingColumn: wjcCore.Event;
+    readonly resizingColumn: wjcCore.Event;
     onResizingColumn(e: CellRangeEventArgs): boolean;
-    resizedColumn: wjcCore.Event;
+    readonly resizedColumn: wjcCore.Event;
     onResizedColumn(e: CellRangeEventArgs): void;
-    autoSizingColumn: wjcCore.Event;
+    readonly autoSizingColumn: wjcCore.Event;
     onAutoSizingColumn(e: CellRangeEventArgs): boolean;
-    autoSizedColumn: wjcCore.Event;
+    readonly autoSizedColumn: wjcCore.Event;
     onAutoSizedColumn(e: CellRangeEventArgs): void;
-    draggingColumn: wjcCore.Event;
+    readonly draggingColumn: wjcCore.Event;
     onDraggingColumn(e: CellRangeEventArgs): boolean;
-    draggingColumnOver: wjcCore.Event;
+    readonly draggingColumnOver: wjcCore.Event;
     onDraggingColumnOver(e: CellRangeEventArgs): boolean;
-    draggedColumn: wjcCore.Event;
+    readonly draggedColumn: wjcCore.Event;
     onDraggedColumn(e: CellRangeEventArgs): void;
-    resizingRow: wjcCore.Event;
+    readonly resizingRow: wjcCore.Event;
     onResizingRow(e: CellRangeEventArgs): boolean;
-    resizedRow: wjcCore.Event;
+    readonly resizedRow: wjcCore.Event;
     onResizedRow(e: CellRangeEventArgs): void;
-    autoSizingRow: wjcCore.Event;
+    readonly autoSizingRow: wjcCore.Event;
     onAutoSizingRow(e: CellRangeEventArgs): boolean;
-    autoSizedRow: wjcCore.Event;
+    readonly autoSizedRow: wjcCore.Event;
     onAutoSizedRow(e: CellRangeEventArgs): void;
-    draggingRow: wjcCore.Event;
+    readonly draggingRow: wjcCore.Event;
     onDraggingRow(e: CellRangeEventArgs): boolean;
-    draggingRowOver: wjcCore.Event;
+    readonly draggingRowOver: wjcCore.Event;
     onDraggingRowOver(e: CellRangeEventArgs): boolean;
-    draggedRow: wjcCore.Event;
+    readonly draggedRow: wjcCore.Event;
     onDraggedRow(e: CellRangeEventArgs): void;
-    groupCollapsedChanging: wjcCore.Event;
+    readonly groupCollapsedChanging: wjcCore.Event;
     onGroupCollapsedChanging(e: CellRangeEventArgs): boolean;
-    groupCollapsedChanged: wjcCore.Event;
+    readonly groupCollapsedChanged: wjcCore.Event;
     onGroupCollapsedChanged(e: CellRangeEventArgs): void;
-    sortingColumn: wjcCore.Event;
+    readonly sortingColumn: wjcCore.Event;
     onSortingColumn(e: CellRangeEventArgs): boolean;
-    sortedColumn: wjcCore.Event;
+    readonly sortedColumn: wjcCore.Event;
     onSortedColumn(e: CellRangeEventArgs): void;
-    beginningEdit: wjcCore.Event;
+    readonly beginningEdit: wjcCore.Event;
     onBeginningEdit(e: CellRangeEventArgs): boolean;
-    prepareCellForEdit: wjcCore.Event;
+    readonly prepareCellForEdit: wjcCore.Event;
     onPrepareCellForEdit(e: CellRangeEventArgs): void;
-    cellEditEnding: wjcCore.Event;
+    readonly cellEditEnding: wjcCore.Event;
     onCellEditEnding(e: CellEditEndingEventArgs): boolean;
-    cellEditEnded: wjcCore.Event;
+    readonly cellEditEnded: wjcCore.Event;
     onCellEditEnded(e: CellRangeEventArgs): void;
-    rowEditStarting: wjcCore.Event;
+    readonly rowEditStarting: wjcCore.Event;
     onRowEditStarting(e: CellRangeEventArgs): void;
-    rowEditStarted: wjcCore.Event;
+    readonly rowEditStarted: wjcCore.Event;
     onRowEditStarted(e: CellRangeEventArgs): void;
-    rowEditEnding: wjcCore.Event;
+    readonly rowEditEnding: wjcCore.Event;
     onRowEditEnding(e: CellRangeEventArgs): void;
-    rowEditEnded: wjcCore.Event;
+    readonly rowEditEnded: wjcCore.Event;
     onRowEditEnded(e: CellRangeEventArgs): void;
-    rowAdded: wjcCore.Event;
+    readonly rowAdded: wjcCore.Event;
     onRowAdded(e: CellRangeEventArgs): void;
-    deletingRow: wjcCore.Event;
+    readonly deletingRow: wjcCore.Event;
     onDeletingRow(e: CellRangeEventArgs): boolean;
-    deletedRow: wjcCore.Event;
+    readonly deletedRow: wjcCore.Event;
     onDeletedRow(e: CellRangeEventArgs): void;
-    copying: wjcCore.Event;
+    readonly copying: wjcCore.Event;
     onCopying(e: CellRangeEventArgs): boolean;
-    copied: wjcCore.Event;
+    readonly copied: wjcCore.Event;
     onCopied(e: CellRangeEventArgs): void;
-    pasting: wjcCore.Event;
+    readonly pasting: wjcCore.Event;
     onPasting(e: CellRangeEventArgs): boolean;
-    pasted: wjcCore.Event;
+    readonly pasted: wjcCore.Event;
     onPasted(e: CellRangeEventArgs): void;
-    pastingCell: wjcCore.Event;
+    readonly pastingCell: wjcCore.Event;
     onPastingCell(e: CellRangeEventArgs): boolean;
-    pastedCell: wjcCore.Event;
+    readonly pastedCell: wjcCore.Event;
     onPastedCell(e: CellRangeEventArgs): void;
-    formatItem: wjcCore.Event;
+    readonly formatItem: wjcCore.Event;
     onFormatItem(e: FormatItemEventArgs): void;
-    updatingView: wjcCore.Event;
+    readonly updatingView: wjcCore.Event;
     onUpdatingView(e: wjcCore.CancelEventArgs): boolean;
-    updatedView: wjcCore.Event;
+    readonly updatedView: wjcCore.Event;
     onUpdatedView(e?: wjcCore.EventArgs): void;
+    _getShowErrors(): boolean;
+    _getError(p: GridPanel, r: number, c: number): string;
+    _setAria(name: string, value: any): void;
+    _setFocus(force: boolean): void;
     _getDefaultRowHeight(): number;
     _getCollectionView(value: any): wjcCore.ICollectionView;
     _getDesiredWidth(p: GridPanel, r: number, c: number, e: HTMLElement): number;
@@ -293,6 +304,7 @@ export declare class FlexGrid extends wjcCore.Control {
     _bindColumns(): void;
     _updateColumnTypes(): void;
     _getBindingColumn(p: GridPanel, r: Number, c: Column): Column;
+    _getRowHeaderPath(): wjcCore.Binding;
     _bindRows(): void;
     _addBoundRow(items: any[], index: number): void;
     _addNode(items: any[], index: number, level: number): void;
@@ -344,9 +356,10 @@ export declare class GridPanel {
     private _offsetY;
     private _vrb;
     private _vru;
-    private _rowIdx;
+    private _activeCell;
     private static _evtBlur;
-    constructor(g: FlexGrid, cellType: CellType, rows: RowCollection, cols: ColumnCollection, element: HTMLElement);
+    static readonly _INDEX_KEY: string;
+    constructor(g: FlexGrid, cellType: CellType, rows: RowCollection, cols: ColumnCollection, host: HTMLElement);
     readonly grid: FlexGrid;
     readonly cellType: CellType;
     readonly viewRange: CellRange;
@@ -361,11 +374,14 @@ export declare class GridPanel {
     getSelectedState(r: number, c: number, rng: CellRange): SelectedState;
     readonly hostElement: HTMLElement;
     _getOffsetY(): number;
-    _updateContent(recycle: boolean, state: boolean, offsetY: number): void;
+    _updateContent(recycle: boolean, state: boolean, offsetY: number): HTMLElement;
     _reorderCells(rngNew: CellRange, rngOld: CellRange): void;
     _createRange(start: number, end: number): Range;
-    _renderRow(r: number, rng: CellRange, frozen: boolean, state: boolean, ctr: number): number;
-    _renderCell(r: number, c: number, rng: CellRange, state: boolean, ctr: number): number;
+    _renderColHdrRow(rng: CellRange, state: boolean): number;
+    _renderColHdrCell(row: HTMLElement, c: number, rng: CellRange, state: boolean, ctr: number): number;
+    _renderRowHdrCell(row: HTMLElement, r: number, value: any): number;
+    _renderRow(r: number, rng: CellRange, state: boolean, ctr: number): number;
+    _renderCell(row: HTMLElement, r: number, c: number, rng: CellRange, state: boolean, ctr: number): number;
     _getViewRange(): CellRange;
     _getFrozenPos(): wjcCore.Point;
 }
@@ -435,10 +451,12 @@ export declare class RowCol {
     _f: RowColFlags;
     _pos: number;
     _idx: number;
+    _vidx: number;
     visible: boolean;
     readonly isVisible: boolean;
     readonly pos: number;
     readonly index: number;
+    readonly visibleIndex: number;
     size: number;
     readonly renderSize: number;
     allowResizing: boolean;
@@ -520,6 +538,7 @@ export declare class GroupRow extends Row {
 export declare class RowColCollection extends wjcCore.ObservableArray {
     _g: FlexGrid;
     _frozen: number;
+    _vlen: number;
     _szDef: number;
     _szTot: number;
     _dirty: boolean;
@@ -532,6 +551,7 @@ export declare class RowColCollection extends wjcCore.ObservableArray {
     minSize: number;
     maxSize: number;
     getTotalSize(): number;
+    readonly visibleLength: number;
     getItemAt(position: number): number;
     getNextCell(index: number, move: SelMove, pageSize: number): any;
     canMoveElement(src: number, dst: number): boolean;
@@ -561,12 +581,14 @@ export declare class HitTestInfo {
     _pt: wjcCore.Point;
     _row: number;
     _col: number;
+    _rng: CellRange;
     _edge: number;
     static _SZEDGE: number[];
     constructor(grid: any, pt: any);
     readonly point: wjcCore.Point;
     readonly cellType: CellType;
     readonly panel: GridPanel;
+    readonly grid: FlexGrid;
     readonly row: number;
     readonly col: number;
     readonly range: CellRange;
@@ -606,7 +628,7 @@ export declare class DataMap {
     getDisplayValues(dataItem?: any): string[];
     getKeyValues(): string[];
     isEditable: boolean;
-    mapChanged: wjcCore.Event;
+    readonly mapChanged: wjcCore.Event;
     onMapChanged(e?: wjcCore.EventArgs): void;
     private _indexOf(value, path, caseSensitive);
 }
@@ -635,9 +657,9 @@ export declare enum SelMove {
     PrevCell = 8,
 }
 export declare class _SelectionHandler {
-    _g: FlexGrid;
-    _sel: wjcSelf.CellRange;
-    _mode: wjcSelf.SelectionMode;
+    private _g;
+    private _sel;
+    private _mode;
     constructor(g: FlexGrid);
     selectionMode: SelectionMode;
     selection: CellRange;
@@ -646,10 +668,20 @@ export declare class _SelectionHandler {
     private _getReferenceCell(rowMove, colMove, extend);
     _adjustSelection(rng: CellRange): CellRange;
 }
+export declare enum KeyAction {
+    None = 0,
+    MoveDown = 1,
+    MoveAcross = 2,
+    Cycle = 3,
+}
 export declare class _KeyboardHandler {
     _g: FlexGrid;
+    _altDown: boolean;
+    _kaTab: wjcSelf.KeyAction;
+    _kaEnter: wjcSelf.KeyAction;
     constructor(g: FlexGrid);
     _keydown(e: KeyboardEvent): void;
+    _performKeyAction(action: KeyAction, shift: boolean): boolean;
     private _keypress(e);
     private _moveSel(rowMove, colMove, extend);
     private _deleteSel(evt);
@@ -679,6 +711,8 @@ export declare enum AllowDragging {
 export declare class _MouseHandler {
     _g: FlexGrid;
     _htDown: HitTestInfo;
+    _selDown: CellRange;
+    _tsLast: number;
     _isDown: boolean;
     _eMouse: MouseEvent;
     _lbSelState: boolean;
@@ -696,6 +730,9 @@ export declare class _MouseHandler {
     private _mousedown(e);
     private _mousemove(e);
     private _mouseup(e);
+    private _click(e);
+    private _handleClick(e);
+    private _clickSort(e, ht);
     private _dblclick(e);
     private _hover(e);
     private _getResizeCol(ht);
@@ -711,7 +748,6 @@ export declare class _MouseHandler {
     private _finishResizing(e);
     private _startListBoxSelection(row);
     private _handleSelection(ht, extend);
-    private _handleSort(e);
 }
 export declare class _EditHandler {
     _g: FlexGrid;
@@ -719,7 +755,6 @@ export declare class _EditHandler {
     _edt: HTMLInputElement;
     _edItem: any;
     _lbx: wjcInput.ListBox;
-    _htDown: HitTestInfo;
     _fullEdit: boolean;
     _list: any;
     _evtInput: any;
@@ -728,11 +763,18 @@ export declare class _EditHandler {
     finishEditing(cancel?: boolean): boolean;
     readonly activeEditor: HTMLInputElement;
     readonly editRange: CellRange;
-    _getValidationError(): string;
+    getClipString(rng?: CellRange): string;
+    setClipString(text: string, rng?: CellRange): void;
+    _clipToRows(text: string): string[];
+    _clipToCells(text: string): string[];
+    _expandClipString(text: string, rng: CellRange): string;
+    private _updateEditorCell(r, c, updateHdr);
+    private _updateCell(cell);
+    private _getValidationError();
     _allowEditing(r: number, c: number): boolean;
     _commitRowEdits(): void;
     _keydown(e: KeyboardEvent): boolean;
-    _keydownListBox(e: KeyboardEvent): boolean;
+    private _keydownListBox(e);
     _keypress(e: KeyboardEvent): void;
     _toggleListBox(evt: any, rng?: CellRange): boolean;
     private _createListBox();

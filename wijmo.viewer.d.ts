@@ -1054,7 +1054,12 @@ export interface _IHitTestInfo {
     pageIndex: number;
     x: number;
     y: number;
-    hitPageView: boolean;
+    hitWorkingArea: boolean;
+}
+export interface _IPageHitTestInfo {
+    pageIndex: number;
+    x: number;
+    y: number;
 }
 export interface _IPageView {
     pageIndex: number;
@@ -1073,6 +1078,7 @@ export interface _IPageView {
     moveToPosition(position: _IDocumentPosition): IPromise;
     rotatePageTo(pageIndex: number, rotateAngle: _RotateAngle): any;
     hitTest(x: number, y: number): _IHitTestInfo;
+    isPageContentLoaded(pageIndex: number): boolean;
     resetPages(): any;
     invalidate(): any;
     refresh(): any;
@@ -1148,6 +1154,7 @@ export declare class _CompositePageView extends wjcCore.Control implements _IPag
     hitTest(x: number, y: number): _IHitTestInfo;
     resetPages(): void;
     refresh(fullUpdate?: boolean): void;
+    isPageContentLoaded(pageIndex: number): boolean;
 }
 export declare class _PageViewBase extends wjcCore.Control implements _IPageView {
     private _autoHeightCalculated;
@@ -1160,7 +1167,8 @@ export declare class _PageViewBase extends wjcCore.Control implements _IPageView
     private _zoomMode;
     private _touchManager;
     private _zoomModeUpdating;
-    _pagesWrapper: HTMLElement;
+    protected _pagesWrapper: HTMLElement;
+    private _fBorderBoxMode;
     static _pageMargin: number;
     static _pageBorderWidth: number;
     static controlTemplate: string;
@@ -1178,6 +1186,7 @@ export declare class _PageViewBase extends wjcCore.Control implements _IPageView
     dispose(): void;
     _bindTouchEvents(touchManager: _TouchManager): void;
     _initTouchEvents(): void;
+    protected readonly _borderBoxMode: boolean;
     private _zoomByPinch(touchManager, args);
     private _getFixedPosition(position);
     _getAbovePageCount(top: number): number;
@@ -1217,11 +1226,15 @@ export declare class _PageViewBase extends wjcCore.Control implements _IPageView
     _zoomToView(): void;
     _zoomToViewWidth(): void;
     _getTransformedPoint(top: number, left: number): wjcCore.Point;
-    _hitTestPagePosition(top: number, left: number): _IHitTestInfo;
+    _hitTestPagePosition(pnt: _IPageHitTestInfo): _IHitTestInfo;
     rotatePageTo(pageIndex: number, rotateAngle: _RotateAngle): void;
-    hitTest(x: number, y: number): _IHitTestInfo;
+    hitTest(clientX: number, clientY: number): _IHitTestInfo;
     resetPages(): void;
     refresh(fullUpdate?: boolean): void;
+    isPageContentLoaded(pageIndex: number): boolean;
+    protected _hitTestPageIndex(top: number): number;
+    protected _pointInViewPanelClientArea(clientX: number, clientY: number): boolean;
+    protected _panelViewPntToPageView(clientX: number, clientY: number): _IPageHitTestInfo;
 }
 export declare class _Scroller extends wjcCore.Control {
     private static _scrollbarWidth;
@@ -1280,7 +1293,9 @@ export declare class _SinglePageView extends _PageViewBase {
     _innerMoveToPagePosition(pagePercent: number): void;
     moveToPosition(position: _IDocumentPosition): IPromise;
     _moveToPagePosition(position: _IDocumentPosition): void;
-    hitTest(x: number, y: number): _IHitTestInfo;
+    protected _hitTestPageIndex(top: number): number;
+    protected _pointInViewPanelClientArea(clientX: number, clientY: number): boolean;
+    protected _panelViewPntToPageView(clientX: number, clientY: number): _IPageHitTestInfo;
     _render(pageIndex: number): IPromise;
     _guessPageIndex(): number;
     _reserveViewPage(): void;
@@ -1294,6 +1309,8 @@ export declare class _ContinuousPageView extends _PageViewBase {
     private static _preFetchPageCount;
     private _swipeSpeedReducer;
     private _disposeBodyStopSwipe;
+    private _scrollingTimer;
+    private _zoomFactorTimer;
     constructor(element: any);
     _init(): void;
     dispose(): void;
@@ -1301,14 +1318,16 @@ export declare class _ContinuousPageView extends _PageViewBase {
     _bindTouchEvents(touchManager: _TouchManager): void;
     _getAbovePageCount(top: number): number;
     refresh(fullUpdate?: boolean): void;
-    private _hitTestPageIndex(top);
+    protected _hitTestPageIndex(top: number): number;
     _guessPageIndex(): number;
     _render(pageIndex: number): IPromise;
     _moveToPagePosition(position: _IDocumentPosition): void;
-    hitTest(x: number, y: number): _IHitTestInfo;
+    protected _pointInViewPanelClientArea(clientX: number, clientY: number): boolean;
+    protected _panelViewPntToPageView(clientX: number, clientY: number): _IPageHitTestInfo;
     _reserveViewPage(): void;
     _updatePageViewTransform(): void;
     _zoomToViewWidth(): void;
+    private _ensurePageIndexPosition();
 }
 export declare class _SideTabs extends wjcCore.Control {
     private _headersContainer;
@@ -1461,7 +1480,7 @@ export declare class ViewerBase extends wjcCore.Control {
     private _fullScreen;
     private _miniToolbarPinnedTimer;
     private _autoHeightCalculated;
-    private _supportedFormats;
+    private _exportFormats;
     _searchManager: _SearchManager;
     private _rubberband;
     private _magnifier;
@@ -1499,7 +1518,7 @@ export declare class ViewerBase extends wjcCore.Control {
     private _gPageSetupApplyBtn;
     private _gExportsPageTitle;
     private _gExportsPageApplyBtn;
-    private _gExportFormat;
+    private _gExportFormatTitle;
     static _seperatorHtml: string;
     private static _viewpanelContainerMinHeight;
     private static _miniToolbarPinnedTime;
@@ -1566,17 +1585,17 @@ export declare class ViewerBase extends wjcCore.Control {
     private _initSidePanelOutlines();
     private _initSidePanelThumbnails();
     private _initSidePanelExports();
+    private _ensureExportFormatsLoaded();
+    private _updateExportTab(refresh?);
     private _initSidePanelPageSetup();
-    private _updateExportFormats(refresh?);
     _executeAction(action: _ViewerActionType): void;
     _initSearchOptionsMenu(owner: HTMLElement): void;
     _initHamburgerMenu(owner: HTMLElement): void;
     _initViewMenu(owner: HTMLElement): void;
     private _initToolbar();
-    private _clearSupportedFormats();
+    private _clearExportFormats();
     private _supportedExportsDesc;
     private readonly _exportItemDescriptions;
-    private _updateSupportedFormats();
     _actionIsChecked(action: _ViewerActionType): boolean;
     _actionIsDisabled(action: _ViewerActionType): boolean;
     _actionIsShown(action: _ViewerActionType): boolean;
@@ -1730,47 +1749,67 @@ export interface _IViewerAction {
     checked: boolean;
     shown: boolean;
 }
-export declare class _Rubberband extends wjcCore.Control {
+export declare class _MouseTool extends wjcCore.Control {
     private _pageView;
     private _viewPanelContainer;
-    private _actived;
-    private _startX;
-    private _startY;
-    private static _rubberbandCss;
-    private static _rubberbandActivedCss;
-    private static _rubberbandShowCss;
-    applied: wjcCore.Event;
-    onApplied(): void;
-    constructor(element: any, viewPanelContainer: HTMLElement, pageView: _IPageView);
-    readonly bandRect: _IRect;
-    private _bindEvents();
-    active(): void;
-    deactive(): void;
-    private _start(e);
-    private _stretching(e);
-    private _stop();
-    private _validateBandRect();
-    private _zoom();
+    private _isActive;
+    private _isStarted;
+    private _startPnt;
+    private _stopOnClientOut;
+    private _css;
+    private _activeCss;
+    private _visibleCss;
+    constructor(element: any, viewPanelContainer: HTMLElement, pageView: _IPageView, stopOnClientOut: boolean, css: string, activeCss: string, visibleCss: string);
+    activate(): void;
+    deactivate(): void;
+    reset(): void;
+    readonly isActive: boolean;
+    readonly startPnt: wjcCore.Point;
+    readonly pageView: wjcSelf._IPageView;
+    readonly viewPanelContainer: HTMLElement;
+    protected _initElement(): void;
+    protected _innerStop(pnt?: wjcCore.Point): void;
+    protected _getTemplateParts(): Object;
+    protected _onMouseDown(e: MouseEvent): void;
+    protected _onMouseMove(e: MouseEvent): void;
+    protected _onMouseUp(e: MouseEvent): void;
+    protected _start(ht: _IHitTestInfo): void;
+    protected _move(pnt: wjcCore.Point, ht: _IHitTestInfo): void;
+    protected _stop(pnt?: wjcCore.Point): void;
+    protected _bindEvents(): void;
+    protected _toClientPoint(e: MouseEvent): wjcCore.Point;
+    protected _testPageWorkingAreaHit(pnt: wjcCore.Point): _IHitTestInfo;
 }
-export declare class _Magnifier extends wjcCore.Control {
-    private _pageView;
-    private _viewPanelContainer;
-    private _viewPageDiv;
-    private _actived;
-    private _currentPageIndex;
-    private static _magnification;
-    private static _magnifierActivedCss;
-    private static _magnifierShowCss;
-    private static _viewPageTemplate;
+export declare class _RubberbandOnAppliedEventArgs extends wjcCore.EventArgs {
+    private _rect;
+    constructor(rect: wjcCore.Rect);
+    readonly rect: wjcCore.Rect;
+}
+export declare class _Rubberband extends _MouseTool {
+    applied: wjcCore.Event;
     constructor(element: any, viewPanelContainer: HTMLElement, pageView: _IPageView);
-    private _initElement();
-    private _bindEvents();
+    protected _start(ht: _IHitTestInfo): void;
+    protected _move(pnt: wjcCore.Point, ht: _IHitTestInfo): void;
+    protected _stop(pnt?: wjcCore.Point): void;
+    private _onApplied(e);
+}
+export declare class _Magnifier extends _MouseTool {
+    static controlTemplate: string;
+    private readonly _Magnification;
+    private _viewPageDiv;
+    private _currentPageIndex;
+    constructor(element: any, viewPanelContainer: HTMLElement, pageView: _IPageView);
+    deactivate(): void;
+    reset(): void;
+    protected _getTemplateParts(): {
+        _viewPageDiv: string;
+    };
+    protected _bindEvents(): void;
+    protected _start(ht: _IHitTestInfo): void;
+    protected _move(pnt: wjcCore.Point, ht: _IHitTestInfo): void;
+    private _showMagnifer(pnt, ht);
     private _fillPage(hitPosition);
     private _showHitPosition(hitPosition);
-    private _show(e, start);
-    private _hide();
-    active(): void;
-    deactive(): void;
 }
 export declare class ReportViewer extends ViewerBase {
     private _reportName;
@@ -1789,7 +1828,6 @@ export declare class ReportViewer extends ViewerBase {
     _actionIsDisabled(action: _ViewerActionType): boolean;
     _initHamburgerMenu(owner: HTMLElement): void;
     private _initSidePanelParameters();
-    private _updateLoadingDivContent(content);
     readonly _innerDocumentSource: _Report;
     _loadDocument(value: _Report): IPromise;
     _reRenderDocument(): void;

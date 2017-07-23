@@ -73,6 +73,7 @@ export declare class _CalcEngine {
     private _approximateMatch(lookupValue, cells, sheet?);
     private _checkCache(expression);
     private _ensureNonFunctionExpression(expr, sheet?);
+    private _getDefinedName(name);
 }
 export declare class _Token {
     private _tokenType;
@@ -373,6 +374,7 @@ export declare class FlexSheet extends wjcGrid.FlexGrid {
     _lastVisibleFrozenRow: number;
     _lastVisibleFrozenColumn: number;
     _resettingFilter: boolean;
+    definedNames: wjcCore.ObservableArray;
     static controlTemplate: string;
     constructor(element: any, options?: any);
     readonly sheets: SheetCollection;
@@ -504,6 +506,8 @@ export declare class FlexSheet extends wjcGrid.FlexGrid {
     _scanFormulas(): any[];
     _resetFormulas(formulas: any[]): void;
     _getCellStyle(rowIndex: number, colIndex: number, sheet?: Sheet): ICellStyle;
+    private _validateSheetName(sheetName);
+    private _updateDefinedNameWithSheetRefUpdating(oldSheetName, newSheetName);
 }
 export declare class DraggingRowColumnEventArgs extends wjcCore.EventArgs {
     private _isDraggingRows;
@@ -535,7 +539,7 @@ export declare class FlexSheetPanel extends wjcGrid.GridPanel {
     getSelectedState(r: number, c: number, rng: wjcGrid.CellRange): wjcGrid.SelectedState;
     getCellData(r: number, c: any, formatted: boolean): any;
     setCellData(r: number, c: any, value: any, coerce?: boolean): boolean;
-    _renderCell(r: number, c: number, vrng: wjcGrid.CellRange, state: boolean, ctr: number): number;
+    _renderCell(row: HTMLElement, r: number, c: number, vrng: wjcGrid.CellRange, state: boolean, ctr: number): number;
 }
 export declare class HeaderRow extends wjcGrid.Row {
     constructor();
@@ -589,7 +593,7 @@ export declare class Sheet {
     _styledCells: any;
     _mergedRanges: any;
     nameChanged: wjcCore.Event;
-    onNameChanged(e: wjcCore.EventArgs): void;
+    onNameChanged(e: wjcCore.PropertyChangedEventArgs): void;
     visibleChanged: wjcCore.Event;
     onVisibleChanged(e: wjcCore.EventArgs): void;
     getCellStyle(rowIndex: number, columnIndex: number): ICellStyle;

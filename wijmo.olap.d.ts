@@ -53,6 +53,7 @@ export declare class PivotCollectionView extends wjcCore.CollectionView {
     constructor(engine: PivotEngine);
     readonly engine: PivotEngine;
     _performSort(items: any[]): void;
+    _getRowLevel(items: any[], index: number): number;
 }
 export declare class PivotField {
     private _ng;
@@ -67,6 +68,7 @@ export declare class PivotField {
     private _wordWrap;
     private _dataType;
     private _filter;
+    private _srtCmp;
     private _descending;
     private _isContentHtml;
     private _parent;
@@ -84,12 +86,13 @@ export declare class PivotField {
     wordWrap: boolean;
     descending: boolean;
     isContentHtml: boolean;
+    sortComparer: Function;
     readonly engine: PivotEngine;
     readonly collectionView: wjcCore.ICollectionView;
     isActive: boolean;
     readonly parentField: PivotField;
     readonly key: string;
-    propertyChanged: wjcCore.Event;
+    readonly propertyChanged: wjcCore.Event;
     onPropertyChanged(e: wjcCore.PropertyChangedEventArgs): void;
     _getIsActive(): boolean;
     _setIsActive(value: boolean): void;
@@ -184,7 +187,6 @@ export declare class PivotFieldEditor extends wjcCore.Control {
     field: PivotField;
     updateEditor(): void;
     updateField(): void;
-    containsFocus(): boolean;
     _initAggregateOptions(): void;
     _initShowAsOptions(): void;
     _initFormatOptions(): void;
@@ -214,7 +216,7 @@ export declare class PivotFilterEditor extends wjcCore.Control {
     updateEditor(): void;
     updateFilter(): void;
     clearEditor(): void;
-    finishEditing: wjcCore.Event;
+    readonly finishEditing: wjcCore.Event;
     onFinishEditing(e?: wjcCore.CancelEventArgs): boolean;
     private _showFilter(filterType);
     _enableLink(a: HTMLLinkElement, enable: boolean): void;
@@ -303,15 +305,15 @@ export declare class PivotEngine {
     getKeys(item: any, binding: string): any;
     editField(field: PivotField): void;
     removeField(field: PivotField): void;
-    itemsSourceChanged: wjcCore.Event;
+    readonly itemsSourceChanged: wjcCore.Event;
     onItemsSourceChanged(e?: wjcCore.EventArgs): void;
-    viewDefinitionChanged: wjcCore.Event;
+    readonly viewDefinitionChanged: wjcCore.Event;
     onViewDefinitionChanged(e?: wjcCore.EventArgs): void;
-    updatingView: wjcCore.Event;
+    readonly updatingView: wjcCore.Event;
     onUpdatingView(e: ProgressEventArgs): void;
-    updatedView: wjcCore.Event;
+    readonly updatedView: wjcCore.Event;
     onUpdatedView(e?: wjcCore.EventArgs): void;
-    error: wjcCore.Event;
+    readonly error: wjcCore.Event;
     onError(e: wjcCore.RequestErrorEventArgs): boolean;
     _copy(key: string, value: any): boolean;
     _getKey(keyString: string): _PivotKey;
@@ -358,6 +360,7 @@ export declare class _ServerConnection {
     getFields(): PivotField[];
     getOutputView(callBack: Function): void;
     getDetail(rowKey: any, colKey: any): any[];
+    private static _getRequestedValue(value);
     clearPendingRequests(): void;
     updateTallies(aggregatedData: any[]): void;
     private _getFieldValue(vf, item, formatted?);
@@ -427,13 +430,13 @@ export declare class PivotPanel extends wjcCore.Control {
     readonly filterFields: PivotFieldCollection;
     viewDefinition: string;
     readonly isViewDefined: boolean;
-    itemsSourceChanged: wjcCore.Event;
+    readonly itemsSourceChanged: wjcCore.Event;
     onItemsSourceChanged(e?: wjcCore.EventArgs): void;
-    viewDefinitionChanged: wjcCore.Event;
+    readonly viewDefinitionChanged: wjcCore.Event;
     onViewDefinitionChanged(e?: wjcCore.EventArgs): void;
-    updatingView: wjcCore.Event;
+    readonly updatingView: wjcCore.Event;
     onUpdatingView(e: ProgressEventArgs): void;
-    updatedView: wjcCore.Event;
+    readonly updatedView: wjcCore.Event;
     onUpdatedView(e?: wjcCore.EventArgs): void;
     refresh(fullUpdate?: boolean): void;
     _copy(key: string, value: any): boolean;
@@ -597,7 +600,7 @@ export declare class PivotChart extends wjcCore.Control {
     private _updateFlexChartOrPie();
     private _updateFlexChart(dataItms, labelsSource, grpLblsSrc);
     private _updateFlexPie(dataItms, labelsSource);
-    private _getLegendPosition(isPie);
+    private _getLegendPosition();
     private _createSeries();
     private _getColumns(itm);
     private _createGroupAxes(groups);

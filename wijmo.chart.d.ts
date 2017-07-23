@@ -70,7 +70,6 @@ export declare class FlexChartBase extends wjcCore.Control implements _IPalette 
     saveImageToDataUrl(format: ImageFormat, done: Function): void;
     _exportToImage(extension: any, processDataURI: any): void;
     refresh(fullUpdate?: boolean): void;
-    containsFocus(): boolean;
     selectionChanged: wjcCore.Event;
     onSelectionChanged(e?: wjcCore.EventArgs): void;
     onLostFocus(e?: wjcCore.EventArgs): void;
@@ -282,6 +281,7 @@ export declare class FlexChartCore extends FlexChartBase {
     private _lblAreas;
     private _keywords;
     private _curPlotter;
+    private _colRowLens;
     _bindingSeparator: string;
     constructor(element: any, options?: any);
     _initAxes(): void;
@@ -319,7 +319,7 @@ export declare class FlexChartCore extends FlexChartBase {
     _render(engine: IRenderEngine, applyElement?: boolean): void;
     _getDesiredLegendSize(engine: IRenderEngine, isVertical: boolean, width: number, height: number): wjcCore.Size;
     _renderLegend(engine: IRenderEngine, pos: wjcCore.Point, areas: any[], isVertical: boolean, width: number, height: number): void;
-    private _renderLegendElements(engine, series, pos, areas, isVertical, width, height);
+    private _renderLegendElements(engine, series, pos, p, areas, isVertical, width, height, colRowLen);
     private _renderLabels(engine);
     private _getAxes();
     private _clearPlotters();

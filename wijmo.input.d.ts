@@ -71,6 +71,11 @@ export declare class Calendar extends wjcCore.Control {
     private _itemValidator;
     private _readOnly;
     private _selMode;
+    private _fmtYrMo;
+    private _fmtYr;
+    private _fmtDayHdr;
+    private _fmtDay;
+    private _fmtMonths;
     static controlTemplate: string;
     constructor(element: any, options?: any);
     value: Date;
@@ -80,6 +85,11 @@ export declare class Calendar extends wjcCore.Control {
     isReadOnly: boolean;
     firstDayOfWeek: number;
     displayMonth: Date;
+    formatYearMonth: string;
+    formatDayHeaders: string;
+    formatDays: string;
+    formatYear: string;
+    formatMonths: string;
     showHeader: boolean;
     monthView: boolean;
     itemFormatter: Function;
@@ -513,6 +523,7 @@ export declare class InputNumber extends wjcCore.Control {
     _composing: boolean;
     _decChar: string;
     _currChar: string;
+    _fmtSpec: string;
     _rxSym: RegExp;
     _rxNegStart: RegExp;
     static controlTemplate: string;
@@ -539,8 +550,8 @@ export declare class InputNumber extends wjcCore.Control {
     refresh(fullUpdate?: boolean): void;
     private _updateSymbols();
     private _clamp(value);
-    private _isNumeric(chr, digitsOnly?);
-    private _getInputRange(digitsOnly?);
+    private _isNumeric(chr, digitsOnly);
+    private _getInputRange(digitsOnly);
     private _flipSign();
     private _getSelStart();
     private _getSelStartDigits();

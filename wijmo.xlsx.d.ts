@@ -79,6 +79,7 @@ export declare class _xlsx {
     private static _checkValidMergeCell(merges, startRow, rowSpan, startCol, colSpan);
     private static _getAttr(s, attr);
     private static _getChildNodeValue(s, child);
+    private static _getSheetIndexBySheetName(file, sheetName);
 }
 export declare class _Promise {
     private _callbacks;
@@ -105,11 +106,13 @@ export declare class Workbook implements IWorkbook {
     private _reservedContent;
     private _sheets;
     private _styles;
+    private _definedNames;
     private static _alphabet;
     private static _formatMap;
     constructor();
     readonly sheets: WorkSheet[];
     readonly styles: WorkbookStyle[];
+    readonly definedNames: DefinedName[];
     reservedContent: any;
     save(fileName?: string): string;
     saveAsync(fileName?: string, onSaved?: (base64?: string) => any, onError?: (reason?: any) => any): void;
@@ -143,8 +146,10 @@ export declare class Workbook implements IWorkbook {
     static _base64EncArr(aBytes: Uint8Array): string;
     private _serializeWorkSheets();
     private _serializeWorkbookStyles();
+    private _serializeDefinedNames();
     private _deserializeWorkSheets(workSheets);
     private _deserializeWorkbookStyles(workbookStyles);
+    private _deserializeDefinedNames(definedNames);
 }
 export declare class WorkSheet implements IWorkSheet {
     name: string;
@@ -263,6 +268,14 @@ export declare class WorkbookBorderSetting implements IWorkbookBorderSetting {
     _serialize(): IWorkbookBorderSetting;
     _deserialize(workbookBorderSettingOM: IWorkbookBorderSetting): void;
 }
+export declare class DefinedName implements IDefinedName {
+    name: string;
+    value: any;
+    sheetName: string;
+    constructor();
+    _serialize(): IDefinedName;
+    _deserialize(definedNameOM: IDefinedName): void;
+}
 export interface IXlsxFileContent {
     base64: string;
     base64Array: Uint8Array;
@@ -314,6 +327,7 @@ export interface IWorkbook {
     activeWorksheet?: number;
     styles?: IWorkbookStyle[];
     reservedContent?: any;
+    definedNames?: IDefinedName[];
 }
 export interface IWorkbookStyle {
     format?: string;
@@ -359,6 +373,11 @@ export interface ITableAddress {
     col: number;
     absCol: boolean;
     absRow: boolean;
+}
+export interface IDefinedName {
+    name: string;
+    value: any;
+    sheetName?: string;
 }
 export declare enum HAlign {
     General = 0,
